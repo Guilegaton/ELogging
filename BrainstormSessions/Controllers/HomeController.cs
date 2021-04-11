@@ -35,6 +35,7 @@ namespace BrainstormSessions.Controllers
 
             _logger.Info("Home controller, Index page call");
 
+            _logger.Debug("test");
             return View(model);
         }
 
