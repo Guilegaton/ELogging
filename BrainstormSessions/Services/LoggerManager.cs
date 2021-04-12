@@ -30,8 +30,8 @@ namespace BrainstormSessions.Services
                                          .FirstOrDefault();
 
             _logFilePath = rootAppender != null ? rootAppender.File : string.Empty;
-            var fileNameIndex = _logFilePath.IndexOf($"\\{DateTime.Now.ToString("yyyy-MM-dd")}.txt");
-            _logFilePath = _logFilePath.Remove(fileNameIndex);
+            var dateRegex = new Regex(@"\\[0-9]{4}-[0-9]{2}-[0-9]{2}\.txt");
+            _logFilePath = dateRegex.Replace(_logFilePath, string.Empty);
         }
 
         public static Core.Interfaces.ILogger GetLogger<TModel>()
