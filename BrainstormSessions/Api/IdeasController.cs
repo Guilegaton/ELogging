@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BrainstormSessions.ClientModels;
 using BrainstormSessions.Core.Interfaces;
 using BrainstormSessions.Core.Model;
+using BrainstormSessions.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BrainstormSessions.Api
@@ -12,10 +13,12 @@ namespace BrainstormSessions.Api
     public class IdeasController : ControllerBase
     {
         private readonly IBrainstormSessionRepository _sessionRepository;
+        private readonly ILogger _logger;
 
         public IdeasController(IBrainstormSessionRepository sessionRepository)
         {
             _sessionRepository = sessionRepository;
+            _logger = LoggerManager.GetLogger<IdeasController>();
         }
 
         #region snippet_ForSessionAndCreate
@@ -25,6 +28,7 @@ namespace BrainstormSessions.Api
             var session = await _sessionRepository.GetByIdAsync(sessionId);
             if (session == null)
             {
+                _logger.Warn("Session not found");
                 return NotFound(sessionId);
             }
 
@@ -44,12 +48,14 @@ namespace BrainstormSessions.Api
         {
             if (!ModelState.IsValid)
             {
+                _logger.Error("Model isn't valid");
                 return BadRequest(ModelState);
             }
 
             var session = await _sessionRepository.GetByIdAsync(model.SessionId);
             if (session == null)
             {
+                _logger.Warn("Session not found");
                 return NotFound(model.SessionId);
             }
 
@@ -62,6 +68,8 @@ namespace BrainstormSessions.Api
             session.AddIdea(idea);
 
             await _sessionRepository.UpdateAsync(session);
+
+            _logger.Info($"Idea added to session. Session: {session.Id}");
 
             return Ok(session);
         }
@@ -77,6 +85,7 @@ namespace BrainstormSessions.Api
 
             if (session == null)
             {
+                _logger.Warn("Session not found");
                 return NotFound(sessionId);
             }
 
@@ -101,6 +110,7 @@ namespace BrainstormSessions.Api
         {
             if (!ModelState.IsValid)
             {
+                _logger.Error("Model isn't valid");
                 return BadRequest(ModelState);
             }
 
@@ -108,6 +118,7 @@ namespace BrainstormSessions.Api
 
             if (session == null)
             {
+                _logger.Warn("Session not found");
                 return NotFound(model.SessionId);
             }
 
@@ -120,6 +131,8 @@ namespace BrainstormSessions.Api
             session.AddIdea(idea);
 
             await _sessionRepository.UpdateAsync(session);
+
+            _logger.Info($"Idea added to session. Session: {session.Id}");
 
             return CreatedAtAction(nameof(CreateActionResult), new { id = session.Id }, session);
         }
